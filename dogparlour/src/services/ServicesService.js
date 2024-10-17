@@ -26,7 +26,7 @@ export const uploadService = async (serviceData, token) => {
     const response = await fetch(`${BASE_URL}/api/services`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`, // Include JWT token
+        Authorization: `Bearer ${token}`, 
       },
       body: formData,
     });
@@ -49,4 +49,26 @@ export const uploadService = async (serviceData, token) => {
     throw error;
   }
 };
+
+export const deleteService = async (id, token) => {
+  try {
+      const response = await fetch(`http://localhost:8080/api/services/${id}`, {
+          method: 'DELETE',
+          headers: {
+              'Authorization': `Bearer ${token}`,  
+              'Content-Type': 'application/json',
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error('Failed to delete service');
+      }
+
+      return response.json();  
+  } catch (error) {
+      console.error('Error deleting service:', error);
+      throw error;
+  }
+};
+
 

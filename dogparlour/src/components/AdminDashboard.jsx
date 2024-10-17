@@ -15,7 +15,7 @@ export default function AdminDashboard() {
          
             <ul className="nav flex-column">
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/services">
+                <Link className="nav-link" to="/admin/list-services">
                   Manage Services
                 </Link>
               </li>
@@ -25,8 +25,8 @@ export default function AdminDashboard() {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/reports">
-                  View Reports
+                <Link className="nav-link" to="/admin/appointments">
+                  View Appointments
                 </Link>
               </li>
               <li className="nav-item">

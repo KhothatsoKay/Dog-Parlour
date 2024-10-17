@@ -12,7 +12,7 @@ export const AuthService = {
       if (!response.ok) {
         throw new Error('Signup failed');
       }
-      return await response.json();
+      console.log("Sign Up successful", response.json);
     } catch (error) {
       throw error;
     }
@@ -45,7 +45,7 @@ export const AuthService = {
     const token = this.getToken(); 
 
     if (!token) {
-      throw new Error('No token available');
+      throw new Error('Please log in!');
     }
 
     try {
@@ -96,4 +96,24 @@ export const AuthService = {
   logout() {
     localStorage.removeItem('jwt');
   },
+
+  async updateProfile(updatedUser) {
+    const token = localStorage.getItem('jwt');
+    if (!token) throw new Error('No token available');
+
+    const response = await fetch(`${BASE_URL}/api/auth/update-user`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedUser),
+    });
+
+    if (!response.ok) {
+      throw new Error('Profile update failed');
+    }
+
+    console.log(response);
+  }
 };

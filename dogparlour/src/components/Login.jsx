@@ -7,7 +7,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,21 +33,26 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
       await AuthService.login(credentials);
       setSuccess('Login successful!');
 
-      const currentUser = await AuthService.getCurrentUser(); 
+      const currentUser = await AuthService.getCurrentUser();
       setUser(currentUser);
-      const hasAdminAuthority = currentUser.authorities.some(authority => authority.authority === "ROLE_ADMIN");
 
-      if (hasAdminAuthority) {
-        navigate("/admin"); 
+      const needsProfileUpdate = !currentUser.firstName || !currentUser.lastName || !currentUser.phoneNumber || !currentUser.dogs || currentUser.dogs.length === 0;
+      if (needsProfileUpdate) {
+        navigate("/profile"); 
       } else {
-        navigate("/"); 
+        const hasAdminAuthority = currentUser.authorities.some(authority => authority.authority === "ROLE_ADMIN");
+        if (hasAdminAuthority) {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       }
-      
+
       setCredentials({ username: '', password: '' });
     } catch (err) {
       setError(err.message || 'Failed to log in.');
@@ -63,7 +69,7 @@ export default function Login() {
             <h2 className="text-center mb-4">Login</h2>
             {error && <div className="alert alert-danger mb-4">{error}</div>}
             {success && <div className="alert alert-success mb-4">{success}</div>}
-            
+
             <div className="mb-3">
               <label className="form-label" htmlFor="username">Username</label>
               <input
@@ -75,7 +81,7 @@ export default function Login() {
                 required
               />
             </div>
-            
+
             <div className="mb-3">
               <label className="form-label" htmlFor="password">Password</label>
               <input
@@ -87,7 +93,7 @@ export default function Login() {
                 required
               />
             </div>
-            
+
             <button type="submit" disabled={loading} className="btn btn-primary w-100">
               {loading ? 'Logging in...' : 'Log In'}
             </button>

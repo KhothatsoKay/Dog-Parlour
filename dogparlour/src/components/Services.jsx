@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { fetchServices } from '../services/ServicesService';
+import { AuthService } from '../services/AuthService';
+import { useNavigate } from 'react-router-dom';
 
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(false);
+  const [user, setUser] = useState(null); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getServices = async () => {
@@ -19,7 +22,18 @@ export default function Services() {
       }
     };
 
+    const getCurrentUser = async () => {
+      try {
+        const currentUser = await AuthService.getCurrentUser();
+        setUser(currentUser); 
+        console.log(currentUser);
+      } catch (err) {
+        console.log('No user logged in', err.message);
+      }
+    };
+
     getServices();
+    getCurrentUser();
   }, []);
 
   if (loading) {
@@ -30,9 +44,9 @@ export default function Services() {
     return <div>Error: {error}</div>;
   }
 
-  function bookService() {
+  function bookService(serviceId) {
     if (user) {
-      alert('Going to service');
+      navigate(`/book-appointment/${serviceId}`);
     } else {
       alert("Please log in first!");
     }
@@ -54,7 +68,7 @@ export default function Services() {
               )}
               <div className="card-body">
                 <h5 className="card-title">{service.serviceName}</h5>
-                <button onClick={bookService} className="btn btn-primary">
+                <button onClick={() => bookService(service.id)} className="btn btn-primary">
                   Book Service
                 </button>
               </div>
