@@ -33,14 +33,14 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+  
     try {
       await AuthService.login(credentials);
       setSuccess('Login successful!');
-
+  
       const currentUser = await AuthService.getCurrentUser();
       setUser(currentUser);
-
+  
       const needsProfileUpdate = !currentUser.firstName || !currentUser.lastName || !currentUser.phoneNumber || !currentUser.dogs || currentUser.dogs.length === 0;
       if (needsProfileUpdate) {
         navigate("/profile"); 
@@ -52,15 +52,19 @@ export default function Login() {
           navigate("/");
         }
       }
-
+  
       setCredentials({ username: '', password: '' });
     } catch (err) {
-      setError(err.message || 'Failed to log in.');
+      if (err.message === 'Your email is not verified. Please verify your email before logging in.') {
+        setError(err.message);
+      } else {
+        setError(err.message || 'Failed to log in.');
+      }
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="container-fluid d-flex justify-content-center align-items-center min-vh-100" style={{ marginTop: '60px' }}>
       <div className="row w-100">
