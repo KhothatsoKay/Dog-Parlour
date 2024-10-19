@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080/api/appointments';
+const BASE_URL = import.meta.env.VITE_API_URL + '/api/appointments';
 
 export const AppointmentService = {
     async createAppointment(appointmentData) {
@@ -103,6 +103,22 @@ async deleteAppointment(id) {
     } catch (error) {
         throw error;
     }
+}, 
+updateAppointmentStatus: async (appointmentId, newStatus) => {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/appointments/${appointmentId}/status`, {
+      method: 'PUT',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+      },
+      body: JSON.stringify(newStatus),
+  });
+
+  if (!response.ok) {
+      throw new Error('Failed to update appointment status');
+  }
+
+  return await response.json();
 }
 
 };

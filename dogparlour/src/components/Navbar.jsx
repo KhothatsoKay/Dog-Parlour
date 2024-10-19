@@ -10,7 +10,6 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
-  // Fetch current user on component mount
   useEffect(() => {
     const fetchUser = async () => {
       const token = AuthService.getToken();
@@ -28,7 +27,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     AuthService.logout();
-    setUser(null); // Clear user after logout
+    setUser(null); 
     toggleMenu();
   };
 

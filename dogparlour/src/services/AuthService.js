@@ -1,5 +1,5 @@
-const BASE_URL = "http://localhost:8080";
-
+const BASE_URL = import.meta.env.VITE_API_URL;
+console.log(BASE_URL);
 export const AuthService = {
   async signup(userData) {
     try {
@@ -24,53 +24,31 @@ export const AuthService = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
       });
-
+  
       if (!response.ok) {
-        let errorResponse;
-
-        const contentType = response.headers.get("Content-Type");
-        if (contentType && contentType.includes("application/json")) {
-          errorResponse = await response.json();
-        } else {
-          errorResponse = await response.text();
-        }
-
-        if (response.status === 401) {
-          if (
-            typeof errorResponse === "string" &&
-            errorResponse.includes("Email is not verified")
-          ) {
-            throw new Error(
-              "Your email is not verified. Please verify your email before logging in."
-            );
-          } else if (
-            errorResponse.message &&
-            errorResponse.message.includes("Email is not verified")
-          ) {
-            throw new Error(
-              "Your email is not verified. Please verify your email before logging in."
-            );
-          }
-        }
-
-        throw new Error(errorResponse || "Login failed");
+        const errorResponse = await response.text(); 
+        throw new Error(errorResponse.message || "Invalid username or password");
       }
-
+  
       const token = response.headers.get("Authorization");
       if (token) {
         localStorage.setItem("jwt", token);
+      } else {
+        throw new Error("Login failed, no token received.");
       }
-
+  
       return await response.json();
     } catch (error) {
+      console.error("Login error:", error);
       throw error;
     }
-  },
+  },  
 
   async getCurrentUser() {
     const token = this.getToken();
 
     if (!token) {
+      console.error("No token found, user might not be logged in.");
       throw new Error("Please log in!");
     }
 
@@ -84,11 +62,15 @@ export const AuthService = {
       });
 
       if (!response.ok) {
+        console.error("Failed to fetch user, response:", response);
         throw new Error("Failed to fetch current user");
       }
 
-      return await response.json();
+      const userData = await response.json();
+      console.log("User data fetched successfully:", userData);
+      return userData;
     } catch (error) {
+      console.error("Error fetching user:", error);
       throw error;
     }
   },

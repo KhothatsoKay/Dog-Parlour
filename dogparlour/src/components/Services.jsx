@@ -54,7 +54,7 @@ export default function Services() {
 
   return (
     <div>
-      <h2 className='mb-4'>Our Services</h2>
+      {/* <h2 className='mb-4'>Our Services</h2> */}
       <div className="row">
         {services.map((service) => (
           <div key={service.id} className="col-md-4 mb-4">

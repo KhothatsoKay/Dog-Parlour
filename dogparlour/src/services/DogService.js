@@ -1,10 +1,10 @@
 
-const BASE_URL = 'http://localhost:8080/api/dogs';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const DogService = {
   async fetchDogs(userId) {
     try {
-      const response = await fetch(`${BASE_URL}/user/${userId}`, {
+      const response = await fetch(`${BASE_URL}/dogs/user/${userId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('jwt')}`, 

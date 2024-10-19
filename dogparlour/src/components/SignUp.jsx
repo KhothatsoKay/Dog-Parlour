@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthService } from '../services/AuthService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; 
 
 export default function SignUp() {
   const [userData, setUserData] = useState({ 
@@ -13,22 +13,42 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
 
   const navigate = useNavigate();
+
+  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
+  const validatePassword = (password) => password.length >= 6; 
+  const validateUsername = (username) => username.length >= 4; 
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
+  const validateForm = () => {
+    const errors = {};
+
+    if (!userData.firstName) errors.firstName = "First Name is required";
+    if (!userData.lastName) errors.lastName = "Last Name is required";
+    if (!validateUsername(userData.username)) errors.username = "Username must be at least 4 characters long";
+    if (!validateEmail(userData.email)) errors.email = "Email is not valid";
+    if (!validatePassword(userData.password)) errors.password = "Password must be at least 6 characters long";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0; 
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setLoading(true);
     setError(null);
 
     try {
       await AuthService.signup(userData);
       setSuccess('Signup successful! Please log in.');
-      setUserData({ firstname: '', lastname: '', username: '', email: '', password: '' });
+      setUserData({ firstName: '', lastName: '', username: '', email: '', password: '' });
       setTimeout(() => {
         navigate("/login");
       }, 2000); 
@@ -52,24 +72,26 @@ export default function SignUp() {
               <label className="form-label" htmlFor="firstname">First Name</label>
               <input
                 type="text"
-                name="firstname"
-                value={userData.firstname}
+                name="firstName"
+                value={userData.firstName}
                 onChange={handleChange}
-                className="form-control"
+                className={`form-control ${formErrors.firstName ? 'is-invalid' : ''}`}
                 required
               />
+              {formErrors.firstName && <div className="invalid-feedback">{formErrors.firstName}</div>}
             </div>
 
             <div className="mb-3">
               <label className="form-label" htmlFor="lastname">Last Name</label>
               <input
                 type="text"
-                name="lastname"
-                value={userData.lastname}
+                name="lastName"
+                value={userData.lastName}
                 onChange={handleChange}
-                className="form-control"
+                className={`form-control ${formErrors.lastName ? 'is-invalid' : ''}`}
                 required
               />
+              {formErrors.lastName && <div className="invalid-feedback">{formErrors.lastName}</div>}
             </div>
 
             <div className="mb-3">
@@ -79,9 +101,10 @@ export default function SignUp() {
                 name="username"
                 value={userData.username}
                 onChange={handleChange}
-                className="form-control"
+                className={`form-control ${formErrors.username ? 'is-invalid' : ''}`}
                 required
               />
+              {formErrors.username && <div className="invalid-feedback">{formErrors.username}</div>}
             </div>
 
             <div className="mb-3">
@@ -91,9 +114,10 @@ export default function SignUp() {
                 name="email"
                 value={userData.email}
                 onChange={handleChange}
-                className="form-control"
+                className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
                 required
               />
+              {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
             </div>
 
             <div className="mb-3">
@@ -103,14 +127,21 @@ export default function SignUp() {
                 name="password"
                 value={userData.password}
                 onChange={handleChange}
-                className="form-control"
+                className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
                 required
               />
+              {formErrors.password && <div className="invalid-feedback">{formErrors.password}</div>}
             </div>
 
             <button type="submit" disabled={loading} className="btn btn-primary w-100">
               {loading ? 'Signing up...' : 'Sign Up'}
             </button>
+
+            <div className="text-center mt-3">
+              <p className="mb-0">
+                Already have an account? <Link to="/login" className="text-primary">Log in</Link>
+              </p>
+            </div>
           </form>
         </div>
       </div>
